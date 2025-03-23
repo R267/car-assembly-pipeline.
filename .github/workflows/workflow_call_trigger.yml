@@ -1,1 +1,69 @@
+name: Create Jira Ticket Workflow
 
+on:
+  # Will trigger the workflow when called from another workflow. 
+  # The other workflow will pass in inputs and secrets.
+  workflow_call:
+    inputs:
+      issuetype:
+        description: Issue Type
+        type: string
+        required: true
+      summary:
+        description: Summary
+        type: string
+        required: true
+      description:
+        description: Description
+        type: string
+        required: false
+        default: 'No description'
+    secrets:
+      JIRA_BASE_URL:
+        required: true
+      JIRA_USER_EMAIL:
+        required: true
+      JIRA_API_TOKEN:
+        required: true
+  # Will trigger the workflow when called manually from the 
+  # GitHub UI or GitHub CLI
+  workflow_dispatch:
+    inputs:
+      issuetype:
+        description: Issue Type
+        required: true
+        default: 'Task'
+        type: choice
+        options:
+          - Task
+          - Bug
+      summary:
+        description: Summary
+        type: string
+        required: true
+      description:
+        description: Description
+        type: string
+        required: false
+        default: 'No description'
+
+jobs:
+  create_jira_ticket:
+    runs-on: ubuntu-latest
+    steps:
+      # Authenticate with Jira first
+      - name: Jira Login
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      # Create the new Jira ticket
+      - name: Create Jira ticket
+        id: create_jira_ticket
+        uses: atlassian/gajira-create@v3
+        with:
+          project: TEST
+          issuetype: ${{ inputs.issuetype }}
+          summary: ${{ inputs.summary }}
+          description: ${{ inputs.description }}
