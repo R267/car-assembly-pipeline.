@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           subject: New Tag Created
           to: ${{ vars.EMAIL_RECIPIENTS }}
-          from: ${{ secrets.MAIL_SENDER }}  # Add this line for the sender's email
+          from: "your-email@example.com"  # Replace with your actual email address
           body: |
             Hi there,
 
