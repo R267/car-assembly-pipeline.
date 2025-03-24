@@ -1,12 +1,12 @@
 name: Triggers Workflow
 
 on:
-  create:
-  delete:
-  deployment:
-  deployment_status:
-  issues:
-    types: opened
+  workflow_call:  # This makes the workflow reusable
+    inputs:
+      some_input:
+        description: 'Some input for this workflow'
+        required: false
+        default: 'default_value'
 
 jobs:
   send_email:
