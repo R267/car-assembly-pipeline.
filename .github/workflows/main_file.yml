@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_call:  # Виклик `triggers.yml`
 
 jobs:
   build:
@@ -29,7 +30,7 @@ jobs:
           echo "Фари" >> build/build_log.txt
 
       - name: Збереження артефактів
-        uses: actions/upload-artifact@v4 # Оновлено до v4
+        uses: actions/upload-artifact@v4
         with:
           name: build_artifacts
           path: build/
@@ -39,7 +40,7 @@ jobs:
     needs: build
     steps:
       - name: Завантаження артефактів
-        uses: actions/download-artifact@v4 # Оновлено до v4
+        uses: actions/download-artifact@v4
         with:
           name: build_artifacts
           path: build/
@@ -51,3 +52,7 @@ jobs:
           grep "Двигун" build_log.txt
           grep "Колеса" build_log.txt
           grep "Фари" build_log.txt
+
+  call-triggers:
+    uses: ./.github/workflows/triggers.yml
+    needs: [build, test]
