@@ -11,7 +11,6 @@ on:
 
 jobs:
   send_email:
-    if: ${{ contains(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     steps:
       - name: Send email
