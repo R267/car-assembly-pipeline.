@@ -1,6 +1,7 @@
 name: Triggers Workflow
 
 on:
+  workflow_call:  # This makes the workflow reusable
   create:
   delete:
   deployment:
