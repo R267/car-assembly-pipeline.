@@ -11,6 +11,7 @@ on:
 
 jobs:
   send_email:
+    if: ${{ contains(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     steps:
       - name: Send email
@@ -22,7 +23,7 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           subject: New Tag Created
           to: ${{ vars.EMAIL_RECIPIENTS }}
-          from: ${{ secrets.MAIL_SENDER }}  # Add this line for the sender's email
+          from: ${{ vars.EMAIL_SENDER }}
           body: |
             Hi there,
 
