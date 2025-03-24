@@ -28,7 +28,6 @@ jobs:
           echo "Двигун" >> build/build_log.txt
           echo "Колеса" >> build/build_log.txt
           echo "Фари" >> build/build_log.txt
-
       - name: Збереження артефактів
         uses: actions/upload-artifact@v4
         with:
@@ -54,5 +53,4 @@ jobs:
           grep "Фари" build_log.txt
 
   call-triggers:
-    uses: ./.github/workflows/triggers.yml  # Виправлений шлях
-    needs: [build, test]
+    uses: ./.github/workflows/triggers.yml  # Виклик іншого workflow
