@@ -1,13 +1,13 @@
 name: Triggers Workflow
 
 on:
-  workflow_call:  # This makes the workflow reusable
+  workflow_call:
     inputs:
       some_input:
         description: 'Some input for this workflow'
         required: false
         default: 'default_value'
-        type: string  # Required type for inputs
+        type: string
 
 jobs:
   send_email:
@@ -65,10 +65,10 @@ jobs:
 
   create_jira_ticket:
     permissions:
-      issues: write  # Add permissions here
-      deployments: write
-      contents: write
-      pull-requests: write
+      contents: read  # Ensure only read permissions
+      issues: write   # Necessary write access for issues
+      deployments: none  # If no deployment-related actions are required
+      pull-requests: none  # If no PR-related actions are required
     runs-on: ubuntu-latest
     steps:
       - name: Jira Login
