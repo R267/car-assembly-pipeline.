@@ -54,5 +54,5 @@ jobs:
           grep "Фари" build_log.txt
 
   call-triggers:
-    uses: ./.github/workflows/triggers.yml
+    uses: ./.github/workflows/triggers.yml  # Виправлений шлях
     needs: [build, test]
