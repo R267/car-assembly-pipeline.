@@ -60,8 +60,8 @@ jobs:
           slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_ACCESS_TOKEN }}
           slack-channel: ${{ vars.SLACK_CHANNEL }}
           slack-text: |
-            A new deployment was created in [${{ github.repository }}](https://github.com/${{ github.repository }}) on \
-            `${{ github.ref }}` (SHA: `${{ github.sha }}`). 
+            A new deployment was created in [R267/car-assembly-pipeline](https://github.com/R267/car-assembly-pipeline) on \
+            `refs/heads/main` (SHA: `fec4653400c055ca396bb02a8bc0da12b0ad5291`).
 
   create_jira_ticket:
     permissions:
