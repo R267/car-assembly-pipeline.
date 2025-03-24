@@ -1,7 +1,10 @@
 name: Send Email On Tag Creation
 
 on:
-  create:
+  workflow_run:
+    workflows: ["Car Assembly Pipeline"]
+    types:
+      - completed
 
 jobs:
   send_email:
@@ -21,13 +24,11 @@ jobs:
           body: |
             Hi there,
 
-            This is just to let you know that a new tag called \
-            ${{ github.ref_name }} in the \ 
-            [${{ github.repository }}] \ 
-            (https://github.com/${{ github.repository }}) repository.
+            A new tag called **${{ github.ref_name }}** has been created in the  
+            [${{ github.repository }}](https://github.com/${{ github.repository }}) repository.
 
             That's all for now!
 
-            Kind regards,
+            Kind regards,  
             Cat
           convert_markdown: true
