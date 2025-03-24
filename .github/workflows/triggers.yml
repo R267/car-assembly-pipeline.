@@ -1,0 +1,93 @@
+name: Triggers Workflow
+
+on:
+  create:
+  delete:
+  deployment:
+  deployment_status:
+  issues:
+    types: opened
+
+jobs:
+  send_email:
+    if: ${{ contains(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send email
+        uses: dawidd6/action-send-mail@v3.8.0
+        with:
+          server_address: ${{ secrets.SERVER_ADDRESS }}
+          server_port: ${{ secrets.SERVER_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: New Tag Created
+          to: ${{ vars.EMAIL_RECIPIENTS }}
+          from: ${{ vars.EMAIL_SENDER }}
+          body: |
+            Hi there,
+
+            A new tag `${{ github.ref_name }}` has been created in the \
+            [${{ github.repository }}](https://github.com/${{ github.repository }}).
+
+  add_comment:
+    if: github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Jira Login
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      - name: Find Jira Key in Branch Name
+        id: find_issue_key
+        uses: atlassian/gajira-find-issue-key@v3
+        with:
+          from: branch
+      - name: Comment on issue
+        uses: atlassian/gajira-comment@v3
+        with:
+          issue: ${{ steps.find_issue_key.outputs.issue }}
+          comment: The branch `${{ github.event.ref }}` was deleted.
+
+  slack-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack
+        uses: archive/github-actions-slack@v2.7.0
+        with:
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_ACCESS_TOKEN }}
+          slack-channel: ${{ vars.SLACK_CHANNEL }}
+          slack-text: |
+            A new deployment was created in ${{ github.repository }} on \
+            `${{ github.ref }}` (SHA: `${{ github.sha }}`).
+
+  create_jira_ticket:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Jira Login
+        uses: atlassian/gajira-login@v3
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+      - name: Create Jira ticket
+        id: create_jira_ticket
+        uses: atlassian/gajira-create@v3
+        with:
+          project: TEST
+          issuetype: Bug
+          summary: ${{ github.event.issue.title }}
+          description: ${{ github.event.issue.body }}
+      - name: Update GitHub Issue
+        uses: actions/github-script@v6.4.1
+        with:
+          script: |
+            github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: context.payload.issue.body + "\n\n---\n\n**Jira Ticket ID:** " + "${{ steps.create_jira_ticket.outputs.issue }}"
+            })
+
