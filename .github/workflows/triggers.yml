@@ -52,17 +52,16 @@ jobs:
           comment: The branch `${{ github.event.ref }}` was deleted.
 
   slack-notification:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Notify Slack
-      uses: archive/github-actions-slack@v2.7.0
-      with:
-        slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_ACCESS_TOKEN }}
-        slack-channel: ${{ vars.SLACK_CHANNEL }}
-        slack-text: |
-          A new deployment was created in [${{ github.repository }}](https://github.com/${{ github.repository }}) on \
-          `${{ github.ref }}` (SHA: `${{ github.sha }}`).
-
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack
+        uses: archive/github-actions-slack@v2.7.0
+        with:
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_ACCESS_TOKEN }}
+          slack-channel: ${{ vars.SLACK_CHANNEL }}
+          slack-text: |
+            A new deployment was created in [${{ github.repository }}](https://github.com/${{ github.repository }}) on \
+            `${{ github.ref }}` (SHA: `${{ github.sha }}`). 
 
   create_jira_ticket:
     permissions:
