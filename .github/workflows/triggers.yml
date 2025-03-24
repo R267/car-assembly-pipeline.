@@ -60,7 +60,7 @@ jobs:
           slack-channel: ${{ vars.SLACK_CHANNEL }}
           slack-text: |
             A new deployment was created in ${{ github.repository }} on \
-            `${{ github.ref }}` (SHA: `${{ github.sha }}`).
+            `${{ github.ref }}` (SHA: `${{ github.sha }}`).  
 
   create_jira_ticket:
     permissions: write-all
@@ -90,4 +90,3 @@ jobs:
               issue_number: context.payload.issue.number,
               body: context.payload.issue.body + "\n\n---\n\n**Jira Ticket ID:** " + "${{ steps.create_jira_ticket.outputs.issue }}"
             })
-
