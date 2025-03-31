@@ -1,6 +1,7 @@
 name: Triggers Workflow
 
 on:
+  # Викликається з іншого workflow
   workflow_call:
     inputs:
       some_input:
@@ -8,6 +9,9 @@ on:
         required: false
         default: 'default_value'
         type: string
+
+  # Тригер спрацьовує при побудові GitHub Pages
+  page_build:
 
 jobs:
   send_email:
@@ -21,11 +25,18 @@ jobs:
           server_port: ${{ secrets.SERVER_PORT }}
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          subject: New Tag Created
+          subject: >
+            ${{ github.event_name == 'page_build' && 'GitHub Pages Build Executed with Status of ' || 'New Tag Created' }}
+            ${{ github.event.build.status || '' }}
           to: ${{ vars.EMAIL_RECIPIENTS }}
           from: ${{ vars.EMAIL_SENDER }}
           body: |
             Hi there,
-
-            A new tag `${{ github.ref_name }}` has been created in the \
-            [${{ github.repository }}](https://github.com/${{ github.repository }}).
+            
+            ${{ github.event_name == 'page_build' && format('A GitHub Pages build ran on the {0} repository. The build executed with the following result: {1}.', github.repository, github.event.build.status) || format('A new tag `{0}` has been created in the [{1}](https://github.com/{1}).', github.ref_name, github.repository) }}
+            
+            Please navigate to GitHub to see more.
+            
+            All the best,
+            Cat
+          convert_markdown: true
